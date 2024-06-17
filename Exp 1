@@ -1,0 +1,159 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+void insertAtBeginning(struct Node** head_ref, int new_data);
+void insertAfter(struct Node* prev_node, int new_data);
+void insertAtEnd(struct Node** head_ref, int new_data);
+struct Node* findElement(struct Node* head, int key);
+struct Node* findNext(struct Node* head, int key);
+struct Node* findPrevious(struct Node* head, int key);
+int isLast(struct Node* head, struct Node* node);
+int isEmpty(struct Node* head);
+void deleteAtBeginning(struct Node** head_ref);
+void deleteAfter(struct Node* prev_node);
+void deleteAtEnd(struct Node** head_ref);
+void deleteList(struct Node** head_ref);
+
+int main() {
+    struct Node* head = NULL;
+
+    insertAtBeginning(&head, 1);
+    insertAtEnd(&head, 3);
+    insertAfter(head, 2);
+
+    struct Node* found = findElement(head, 2);
+    struct Node* nextNode = findNext(head, 2);
+    struct Node* prevNode = findPrevious(head, 2);
+
+    int last = isLast(head, head->next);
+    int empty = isEmpty(head);
+
+    deleteAtBeginning(&head);
+    deleteAfter(head);
+    deleteAtEnd(&head);
+    deleteList(&head);
+
+    return 0;
+}
+
+void insertAtBeginning(struct Node** head_ref, int new_data) {
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    new_node->data = new_data;
+    new_node->next = *head_ref;
+    *head_ref = new_node;
+}
+
+void insertAfter(struct Node* prev_node, int new_data) {
+    if (prev_node == NULL) {
+        printf("The given previous node cannot be NULL");
+        return;
+    }
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    new_node->data = new_data;
+    new_node->next = prev_node->next;
+    prev_node->next = new_node;
+}
+
+void insertAtEnd(struct Node** head_ref, int new_data) {
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    struct Node* last = *head_ref;
+    new_node->data = new_data;
+    new_node->next = NULL;
+    if (*head_ref == NULL) {
+        *head_ref = new_node;
+        return;
+    }
+    while (last->next != NULL) {
+        last = last->next;
+    }
+    last->next = new_node;
+}
+
+struct Node* findElement(struct Node* head, int key) {
+    struct Node* current = head;
+    while (current != NULL) {
+        if (current->data == key) {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
+struct Node* findNext(struct Node* head, int key) {
+    struct Node* current = findElement(head, key);
+    if (current != NULL && current->next != NULL) {
+        return current->next;
+    }
+    return NULL;
+}
+
+struct Node* findPrevious(struct Node* head, int key) {
+    struct Node* current = head;
+    while (current != NULL && current->next != NULL) {
+        if (current->next->data == key) {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
+int isLast(struct Node* head, struct Node* node) {
+    return (node != NULL && node->next == NULL);
+}
+
+int isEmpty(struct Node* head) {
+    return (head == NULL);
+}
+
+void deleteAtBeginning(struct Node** head_ref) {
+    if (*head_ref == NULL) {
+        return;
+    }
+    struct Node* temp = *head_ref;
+    *head_ref = temp->next;
+    free(temp);
+}
+
+void deleteAfter(struct Node* prev_node) {
+    if (prev_node == NULL || prev_node->next == NULL) {
+        return;
+    }
+    struct Node* temp = prev_node->next;
+    prev_node->next = temp->next;
+    free(temp);
+}
+
+void deleteAtEnd(struct Node** head_ref) {
+    if (*head_ref == NULL) {
+        return;
+    }
+    if ((*head_ref)->next == NULL) {
+        free(*head_ref);
+        *head_ref = NULL;
+        return;
+    }
+    struct Node* temp = *head_ref;
+    while (temp->next->next != NULL) {
+        temp = temp->next;
+    }
+    free(temp->next);
+    temp->next = NULL;
+}
+
+void deleteList(struct Node** head_ref) {
+    struct Node* current = *head_ref;
+    struct Node* next;
+    while (current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+    *head_ref = NULL;
+}
